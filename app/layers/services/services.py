@@ -9,7 +9,7 @@ def getAllImages(input=None):
     # obtiene un listado de datos "crudos" desde la API, usando a transport.py.
     json_collection = [
         {
-          "url": "https://example.com/image1.jpg",
+          "url": "OIP.jfif",
           "name": "Rick Sanchez",
           "status": "Alive",
           "last_location": "Earth",
