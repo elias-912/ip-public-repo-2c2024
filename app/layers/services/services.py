@@ -11,7 +11,7 @@ def getAllImages(input=None):
         {
           "url": "OIP.jfif",
           "name": "Rick Sanchez",
-          "status": "Alive",
+          "status": 'Alive',
           "last_location": "Earth",
           "first_seen": "Pilot"
         }
