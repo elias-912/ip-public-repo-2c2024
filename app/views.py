@@ -53,14 +53,13 @@ def getAllFavouritesByUser(request):
 
 @login_required
 def saveFavourite(request):
-    guarda=services.saveFavourite(request)
-    save=repositories.saveFavourite(guarda)
-    return render(save,'favourites.html')
+    services.saveFavourite(request)
+    return redirect('home')
 
 @login_required
 def deleteFavourite(request):
-    dalete=services.deleteFavourite(request)
-    return (dalete,'favourites.html')
+    services.deleteFavourite(request)     
+    return redirect('home')
 
 @login_required
 def exit(request):
