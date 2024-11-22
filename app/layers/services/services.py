@@ -7,7 +7,6 @@ from ..transport import transport
 
 def getAllImages(input=None):
     # obtiene un listado de datos "crudos" desde la API, usando a transport.py.
-    json_collection =[]
     json_collection=transport.getAllImages(input)#llamamos al archivo transpor y a la funcion getAlllimages y le agregamos como parametro 
                                                  #lo que el usuario ingrese en el buscador
     # recorre cada dato crudo de la colección anterior, lo convierte en una Card y lo agrega a images.

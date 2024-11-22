@@ -16,7 +16,7 @@ def index_page(request):
 def home(request, page=1):
     images = services.getAllImages()
     
-    favourite_list=services.getAllFavourites
+    favourite_list=services.getAllFavourites(request)
     
     paginator=Paginator(images,per_page=20)
     
@@ -54,12 +54,12 @@ def getAllFavouritesByUser(request):
 @login_required
 def saveFavourite(request):
     services.saveFavourite(request)
-    return redirect('home')
+    return getAllFavouritesByUser(request)
 
 @login_required
 def deleteFavourite(request):
     services.deleteFavourite(request)     
-    return redirect('home')
+    return home(request)
 
 @login_required
 def exit(request):
