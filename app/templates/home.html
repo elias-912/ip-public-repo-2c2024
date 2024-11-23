@@ -1,27 +1,38 @@
-{% extends 'header.html' %} {% block content %}
+{% extends 'header.html' %}
+{% block content %}
 <main>
     <h1 class="text-center">Buscador Rick & Morty</h1>
 
     <div class="d-flex justify-content-end" style="margin-bottom: 1%; margin-right: 2rem;">
         <!-- Selector de página -->
-        <nav aria-label="...">
+        <nav aria-label="Paginación">
             <ul class="pagination">
-                <li class="page-item disabled">
-                    <a class="page-link">⬅️</a>
+                <!-- Flecha izquierda: deshabilitada si estás en la primera página -->
+                <li class="page-item {% if pagina_actual == 1 %}disabled{% endif %}">
+                    <a class="page-link" href="?page={{ pagina_actual|add:-1 }}" aria-label="Anterior">
+                        ⬅️
+                    </a>
                 </li>
-                <li class="page-item active" aria-current="page">
-                    <a class="page-link" href="#">1</a>
+
+                <!-- Índices de páginas -->
+                {% for pagina in paginas %}
+                <li class="page-item {% if pagina_actual == pagina %}active{% endif %}">
+                    <a class="page-link" href="?page={{ pagina }}">{{ pagina }}</a>
                 </li>
-                <li class="page-item">
-                    <a class="page-link" href="#">2</a>
-                </li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item">
-                    <a class="page-link" href="#">➡️</a>
+                {% endfor %}
+
+                <!-- Flecha derecha: deshabilitada si estás en la última página -->
+                <li class="page-item {% if pagina_actual == paginas|length %}disabled{% endif %}">
+                    <a class="page-link" href="?page={{ pagina_actual|add:1 }}" aria-label="Siguiente">
+                        ➡️
+                    </a>
                 </li>
             </ul>
         </nav>
     </div>
+</main>
+
+
 
     <div class="d-flex justify-content-center" style="margin-bottom: 1%">
         <!-- Buscador del sitio -->
