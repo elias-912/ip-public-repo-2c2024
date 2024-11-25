@@ -54,12 +54,12 @@ def getAllFavouritesByUser(request):
 @login_required
 def saveFavourite(request):
     services.saveFavourite(request)
-    return getAllFavouritesByUser(request)
+    return home(request)
 
 @login_required
 def deleteFavourite(request):
     services.deleteFavourite(request)     
-    return home(request)
+    return getAllFavouritesByUser(request)
 
 @login_required
 def exit(request):
