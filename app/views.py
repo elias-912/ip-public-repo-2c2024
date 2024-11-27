@@ -1,5 +1,5 @@
 # capa de vista/presentación
-
+#asdtawsdwseas
 from django.shortcuts import redirect, render
 from .layers.services import services
 from django.contrib.auth.decorators import login_required
