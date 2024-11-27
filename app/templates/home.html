@@ -2,27 +2,34 @@
 <main>
     <h1 class="text-center">Buscador Rick & Morty</h1>
 
-    <div class="d-flex justify-content-end" style="margin-bottom: 1%; margin-right: 2rem;">
-        <!-- Selector de página -->
-        <nav aria-label="...">
+    <div class="d-flex justify-content-center" style="margin-bottom: 1%;">
+        <nav aria-label="Paginación">
             <ul class="pagination">
-                <li class="page-item disabled">
-                    <a class="page-link">⬅️</a>
+                <!-- Flecha izquierda para grupos anteriores -->
+                <li class="page-item {% if grupo_inicio <= 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{% if is_search %}{% url 'buscar' %}?page={{ grupo_inicio|add:-10 }}&query={{ search_term }}{% else %}{% url 'home' %}?page={{ grupo_inicio|add:-10 }}{% endif %}" aria-label="Grupo Anterior">
+                        ⬅️
+                    </a>
                 </li>
-                <li class="page-item active" aria-current="page">
-                    <a class="page-link" href="#">1</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="#">2</a>
-                </li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item">
-                    <a class="page-link" href="#">➡️</a>
+    
+                <!-- Índices de páginas (10 a la vez) -->
+                {% for pagina in paginas %}
+                    <li class="page-item {% if pagina_actual == pagina %}active{% endif %}">
+                        <a class="page-link" href="{% if is_search %}{% url 'buscar' %}?page={{ pagina }}&query={{ search_term }}{% else %}{% url 'home' %}?page={{ pagina }}{% endif %}">{{ pagina }}</a>
+                    </li>
+                {% endfor %}
+    
+                <!-- Flecha derecha para grupos siguientes -->
+                <li class="page-item {% if grupo_fin >= total_paginas %}disabled{% endif %}">
+                    <a class="page-link" href="{% if is_search %}{% url 'buscar' %}?page={{ grupo_fin|add:1 }}&query={{ search_term }}{% else %}{% url 'home' %}?page={{ grupo_fin|add:1 }}{% endif %}" aria-label="Grupo Siguiente">
+                        ➡️
+                    </a>
                 </li>
             </ul>
         </nav>
     </div>
 
+    
     <div class="d-flex justify-content-center" style="margin-bottom: 1%">
         <!-- Buscador del sitio -->
         <form class="d-flex" action="{% url 'buscar' %}" method="POST">

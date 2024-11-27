@@ -4,6 +4,12 @@ from ..persistence import repositories
 from ..utilities import translator
 from django.contrib.auth import get_user
 from ..transport import transport
+import requests
+from app.config import config 
+
+def getApiInfo(): #obtiene todas las paginas de la API
+    response = requests.get(config.DEFAULT_REST_API_URL).json()
+    return response['info']
 
 def getAllImages(input=None):
     # obtiene un listado de datos "crudos" desde la API, usando a transport.py.
