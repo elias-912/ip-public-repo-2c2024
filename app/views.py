@@ -1,74 +1,84 @@
 # capa de vista/presentación
-#asdtawsdwseas
+
 from django.shortcuts import redirect, render
 from .layers.services import services
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-from django.core.paginator import Paginator
 from django.shortcuts import render
-from app.layers.persistence import repositories
+
 
 def index_page(request):
     return render(request, 'index.html')
 
 # esta función obtiene 2 listados que corresponden a las imágenes de la API y los favoritos del usuario, y los usa para dibujar el correspondiente template.
 # si el opcional de favoritos no está desarrollado, devuelve un listado vacío.
+
+def calcular_paginacion(total_items, pagina_actual, items_por_pagina=20, paginas_por_grupo=10):
+   
+    total_paginas = (total_items + items_por_pagina - 1) // items_por_pagina
+
+    if pagina_actual < 1: #sirve para no pasarse de los limites de los indices
+        pagina_actual = 1
+    elif pagina_actual > total_paginas:
+        pagina_actual = total_paginas
+
+    grupo_actual = (pagina_actual - 1) // paginas_por_grupo
+    inicio = grupo_actual * paginas_por_grupo + 1
+    fin = min(inicio + paginas_por_grupo - 1, total_paginas)
+    paginas_mostrar = range(inicio, fin + 1) if total_paginas > 0 else []
+
+    inicio_slice = (pagina_actual - 1) * items_por_pagina
+    fin_slice = min(inicio_slice + items_por_pagina, total_items)
+
+    return {
+        'paginas_mostrar': paginas_mostrar,
+        'pagina_actual': pagina_actual,
+        'total_paginas': total_paginas,
+        'grupo_inicio': inicio,
+        'grupo_fin': fin,
+        'inicio_slice': inicio_slice,
+        'fin_slice': fin_slice
+    }
+
 def home(request, page=1):
     try:
         pagina = int(request.GET.get('page', 1))
     except ValueError:
         pagina = 1
 
-    # Obtener información de la API
     api_info = services.getApiInfo()
     total_paginas = api_info['pages']
 
-    # Asegurarse de que la página esté dentro del rango válido
-    if pagina < 1:
-        pagina = 1
-    elif pagina > total_paginas:
-        pagina = total_paginas
+    paginacion = calcular_paginacion(total_paginas * 20, pagina)
 
-    # Calcular el grupo actual y el rango de páginas a mostrar
-    grupo_actual = (pagina - 1) // 10
-    inicio = grupo_actual * 10 + 1
-    fin = min(inicio + 9, total_paginas)
-    paginas_mostrar = range(inicio, fin + 1)
-
-    # Obtener imágenes de la API para la página actual
     list_images = services.getAllImages(f"?page={pagina}")
     favourite_list = services.getAllFavourites(request)
 
-    # No es necesario volver a paginar si la API ya lo hace
     contexto = {
         'images': list_images,
         'favourite_list': favourite_list,
-        'paginas': paginas_mostrar,
-        'pagina_actual': pagina,
-        'total_paginas': total_paginas,
-        'grupo_inicio': inicio,
-        'grupo_fin': fin
+        'paginas': paginacion['paginas_mostrar'],
+        'pagina_actual': paginacion['pagina_actual'],
+        'total_paginas': paginacion['total_paginas'],
+        'grupo_inicio': paginacion['grupo_inicio'],
+        'grupo_fin': paginacion['grupo_fin']
     }
 
     return render(request, 'home.html', contexto)
 
 def search(request):
-    # Obtener término de búsqueda del POST o GET
     search_msg = request.POST.get('query') or request.GET.get('query', '')
     try:
         pagina = int(request.GET.get('page', 1))
     except ValueError:
         pagina = 1
 
-    # Si no hay término de búsqueda, redirigir a home
     if not search_msg:
         return redirect('home')
 
-    # Lista para almacenar todos los resultados coincidentes
     all_matching_images = []
     current_page = 1
 
-    # Recorrer todas las páginas de la API
     while True:
         input = f"?page={current_page}&name={search_msg}"
         try:
@@ -80,13 +90,11 @@ def search(request):
         if not images:
             break
 
-        # Filtrar y almacenar imágenes coincidentes
         all_matching_images.extend(images)
         current_page += 1
 
     total_items = len(all_matching_images)
 
-    # Si no hay resultados, mostrar mensaje sin índices
     if total_items == 0:
         contexto = {
             'images': [],
@@ -96,33 +104,17 @@ def search(request):
         }
         return render(request, 'home.html', contexto)
 
-    # Calcular paginación para 20 items por página
-    total_paginas = (total_items + 19) // 20
+    paginacion = calcular_paginacion(total_items, pagina)
 
-    # Asegurarse de que la página esté dentro del rango válido
-    if pagina < 1:
-        pagina = 1
-    elif pagina > total_paginas:
-        pagina = total_paginas
-
-    # Calcular el grupo actual y el rango de páginas a mostrar
-    grupo_actual = (pagina - 1) // 10
-    inicio = grupo_actual * 10 + 1
-    fin = min(inicio + 9, total_paginas)
-    paginas_mostrar = range(inicio, fin + 1) if total_paginas > 0 else []
-
-    # Paginar los resultados (20 items por página)
-    inicio_slice = (pagina - 1) * 20
-    fin_slice = min(inicio_slice + 20, total_items)
-    images_page = all_matching_images[inicio_slice:fin_slice]
+    images_page = all_matching_images[paginacion['inicio_slice']:paginacion['fin_slice']]
 
     contexto = {
         'images': images_page,
-        'paginas': paginas_mostrar,
-        'pagina_actual': pagina,
-        'total_paginas': total_paginas,
-        'grupo_inicio': inicio,
-        'grupo_fin': fin,
+        'paginas': paginacion['paginas_mostrar'],
+        'pagina_actual': paginacion['pagina_actual'],
+        'total_paginas': paginacion['total_paginas'],
+        'grupo_inicio': paginacion['grupo_inicio'],
+        'grupo_fin': paginacion['grupo_fin'],
         'is_search': True,
         'search_term': search_msg,
         'query': search_msg
