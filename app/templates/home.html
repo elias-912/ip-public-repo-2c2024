@@ -3,42 +3,63 @@
     <h1 class="text-center">Buscador Rick & Morty</h1>
 
     <div class="d-flex justify-content-center" style="margin-bottom: 1%;">
-        <nav aria-label="Paginación">
-            <ul class="pagination">
-                <!-- Flecha izquierda para grupos anteriores -->
-                <li class="page-item {% if grupo_inicio <= 1 %}disabled{% endif %}">
-                    <a class="page-link" href="{% if is_search %}{% url 'buscar' %}?page={{ grupo_inicio|add:-10 }}&query={{ search_term }}{% else %}{% url 'home' %}?page={{ grupo_inicio|add:-10 }}{% endif %}" aria-label="Grupo Anterior">
-                        ⬅️
-                    </a>
-                </li>
-    
-                <!-- Índices de páginas (10 a la vez) -->
-                {% for pagina in paginas %}
-                    <li class="page-item {% if pagina_actual == pagina %}active{% endif %}">
-                        <a class="page-link" href="{% if is_search %}{% url 'buscar' %}?page={{ pagina }}&query={{ search_term }}{% else %}{% url 'home' %}?page={{ pagina }}{% endif %}">{{ pagina }}</a>
-                    </li>
-                {% endfor %}
-    
-                <!-- Flecha derecha para grupos siguientes -->
-                <li class="page-item {% if grupo_fin >= total_paginas %}disabled{% endif %}">
-                    <a class="page-link" href="{% if is_search %}{% url 'buscar' %}?page={{ grupo_fin|add:1 }}&query={{ search_term }}{% else %}{% url 'home' %}?page={{ grupo_fin|add:1 }}{% endif %}" aria-label="Grupo Siguiente">
-                        ➡️
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
+    <nav aria-label="Paginación">
+        <ul class="pagination">
+            <!-- Flecha izquierda para grupos anteriores -->
+            <li class="page-item {% if grupo_inicio <= 1 %}disabled{% endif %}">
+                <a class="page-link" href="{% if is_search %}{% url 'buscar' %}?page={{ grupo_inicio|add:-10 }}&query={{ search_term }}{% else %}{% url 'home' %}?page={{ grupo_inicio|add:-10 }}{% endif %}" aria-label="Grupo Anterior">
+                    ⬅️
+                </a>
+            </li>
 
-    
+            <!-- Índices de páginas (10 a la vez) -->
+            {% for pagina in paginas %}
+                <li class="page-item {% if pagina_actual == pagina %}active{% endif %}">
+                    <a class="page-link" href="{% if is_search %}{% url 'buscar' %}?page={{ pagina }}&query={{ search_term }}{% else %}{% url 'home' %}?page={{ pagina }}{% endif %}">{{ pagina }}</a>
+                </li>
+            {% endfor %}
+
+            <!-- Flecha derecha para grupos siguientes -->
+            <li class="page-item {% if grupo_fin >= total_paginas %}disabled{% endif %}">
+                <a class="page-link" href="{% if is_search %}{% url 'buscar' %}?page={{ grupo_fin|add:1 }}&query={{ search_term }}{% else %}{% url 'home' %}?page={{ grupo_fin|add:1 }}{% endif %}" aria-label="Grupo Siguiente">
+                    ➡️
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
     <div class="d-flex justify-content-center" style="margin-bottom: 1%">
+        
         <!-- Buscador del sitio -->
-        <form class="d-flex" action="{% url 'buscar' %}" method="POST">
+        <form id="search-form" class="d-flex" action="{% url 'buscar' %}" method="POST">
             {% csrf_token %}
             <input class="form-control me-2" type="search" name="query" placeholder="Escribí una palabra" aria-label="Search">
             <button class="btn btn-outline-success" type="submit">Buscar</button>
         </form>
     </div>
+
+    <!-- Texto de carga -->
+    <div id="loading-overlay" style="visibility: hidden; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.5); z-index: 999;">
+        <div id="loading-text" style="font-size: 1.5em; color: #ffffff; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #28a745; border: 2px solid #000000; padding: 10px; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+            Cargando...
+        </div>
+    </div>
     
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('search-form');
+            const loadingOverlay = document.getElementById('loading-overlay');
+    
+            form.addEventListener('submit', function() {
+                loadingOverlay.style.visibility = 'visible'; // Mostrar el overlay de carga
+            });
+    
+            window.addEventListener('load', function() {
+                loadingOverlay.style.visibility = 'hidden'; // Ocultar el overlay de carga cuando la página se carga
+            });
+        });
+    </script>
 
     <div class="row row-cols-1 row-cols-md-3 g-4">
         {% if images|length == 0 %}
