@@ -47,7 +47,9 @@ def login_view(request):
             return redirect('home')  # Redirige a la página principal
 
 
-def calcular_paginacion(total_items, pagina_actual, items_por_pagina=20, paginas_por_grupo=10):
+def calcular_paginacion(total_items, pagina_actual):
+    items_por_pagina=20
+    paginas_por_grupo=10
    
     total_paginas = (total_items + items_por_pagina - 1) // items_por_pagina #calcual cuantos indices se necesitaran, se suma los items de pagina menos 1 para redondear hacia arriba
     #sirve para no pasarse de los limites de los indices
