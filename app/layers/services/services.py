@@ -7,7 +7,7 @@ from ..transport import transport
 import requests
 from app.config import config 
 
-def getApiInfo(): #obtiene todas las paginas de la API
+def getApiInfo(): #permite acceder a la informacion de la api
     response = requests.get(config.DEFAULT_REST_API_URL).json()
     return response['info']
 

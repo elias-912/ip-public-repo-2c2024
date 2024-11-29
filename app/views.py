@@ -45,10 +45,6 @@ def login_view(request):
             login(request, user)  # Inicia la sesión
             messages.success(request, 'Sesión iniciada correctamente.')
             return redirect('home')  # Redirige a la página principal
-        else:
-            messages.error(request, 'Usuario o contraseña incorrectos. Intenta nuevamente.')
-            #se muestra un mensaje de error y dirije al login.html
-    return render(request, 'login.html')
 
 
 def calcular_paginacion(total_items, pagina_actual, items_por_pagina=20, paginas_por_grupo=10):
@@ -132,15 +128,6 @@ def search(request):
         current_page += 1
 
     total_items = len(all_matching_images)
-
-    if total_items == 0:
-        contexto = {
-            'images': [],
-            'is_search': True,
-            'search_term': search_msg,
-            'total_paginas': 0
-        }
-        return render(request, 'home.html', contexto)
 
     paginacion = calcular_paginacion(total_items, pagina) #se crean indices para las busquedas
 
